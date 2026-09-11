@@ -9,12 +9,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# @st.cache_data #Decorator to speed up the app
+@st.cache_data #Decorator to speed up the app
 def load_dataset():
     try:
         df = pd.read_csv("cleaned_facilities_records.csv")
         return df
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         st.warning(f'Error! File does not exist: {e}')
 
 
@@ -99,11 +99,11 @@ def kpi_display(filtered_df):
 
     with col2:
         total_students = filtered_df['num_students_total'].sum() if len(filtered_df) > 0 else 0
-        st.metric('👩🏻‍🤝‍👩🏼Total Students', format_students(total_students))    
+        st.metric('👩🏻Total Students', format_students(total_students))    
 
     with col3:
         average_students = filtered_df['num_students_total'].mean() if len(filtered_df) > 0 else 0
-        st.metric('🧑🏻‍🤝‍🧑🏼Average Students', f'{average_students:.2f}')
+        st.metric('👩🏻Average Students', f'{average_students:.2f}')
 
     with col4:
         electricity = (filtered_df['phcn_electricity'] == True).sum() / len(filtered_df) * 100 if len(filtered_df) > 0 else 0
