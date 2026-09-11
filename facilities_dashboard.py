@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-@st.cache_data #Decorator to speed up the app
+# @st.cache_data #Decorator to speed up the app
 def load_dataset():
     try:
         df = pd.read_csv("cleaned_facilities_records.csv")
@@ -34,9 +34,9 @@ def sidebar_filter(df):
     )
 
     location = st.sidebar.multiselect(
-        "Select Local Government",
-        options=df['unique_lga'].unique(),
-        default=df['unique_lga'].unique()
+        "Select State",
+        options=df['state'].unique(),
+        default=df['state'].unique()
     )
     st.sidebar.divider()
 
@@ -75,7 +75,7 @@ def filter_data(df, facility, management, location, start_date, end_date):
     filtered_df = df[
         df['facility_type_display'].isin(facility) & 
         df['management'].isin(management) & 
-        df['unique_lga'].isin(location) & 
+        df['state'].isin(location) & 
         (df["date_of_survey"].dt.date >= start_date) & 
         (df["date_of_survey"].dt.date <= end_date)
     ]
@@ -119,20 +119,20 @@ def charts(filtered_df):
         st.warning('No Filter Selected. Please Adjust Your Selection.')
         return
 
-    col1, col2 = st.columns(2)
 
-    with col1:
-        st.subheader('Distribution of School Types')
-        school_count = filtered_df['facility_type_display'].value_counts()
-        fig1 = px.bar(
-            x=school_count.index,
-            y=school_count.values,
-        )
-        fig1.update_layout(
-            xaxis_title='School Type',
-            yaxis_title='Frequency'
-        )
-        st.plotly_chart(fig1, width='stretch')
+    st.subheader('Distribution of School Types')
+    school_count = filtered_df['facility_type_display'].value_counts()
+    fig1 = px.bar(
+        x=school_count.index,
+        y=school_count.values,
+    )
+    fig1.update_layout(
+        xaxis_title='School Type',
+        yaxis_title='Frequency'
+    )
+    st.plotly_chart(fig1, width='stretch')
+
+    col2, col3 = st.columns(2)
 
     with col2:
         st.subheader('Distribution of Students Population')
@@ -151,8 +151,6 @@ def charts(filtered_df):
             yaxis_title='School Population'
         )
         st.plotly_chart(fig2, width='stretch')
-    
-    col3, col4 = st.columns(2)
 
     with col3:
         st.subheader('Distribution of Unique School Management')
@@ -167,6 +165,8 @@ def charts(filtered_df):
         )
         st.plotly_chart(fig3, width='stretch')
 
+    col4, col5 = st.columns(2)
+
     with col4:
         st.subheader('Electricity Availability')
         electricity_count = filtered_df['phcn_electricity'].value_counts()
@@ -176,8 +176,6 @@ def charts(filtered_df):
             hole=0.5,
         )
         st.plotly_chart(fig4, width='stretch')
-
-    col5, col6 = st.columns(2)
 
     with col5:
             Water_access = (
@@ -199,18 +197,18 @@ def charts(filtered_df):
             st.plotly_chart(fig4, width='stretch')
 
 
-    with col6:
-        fig6 = px.scatter_map(filtered_df,
-            lat='latitude',
-            lon='longitude',
-            hover_name='facility_name',
-            zoom=4,
-            height=600,
-        )
-        fig6.update_layout(
-            map_style='open-street-map'
-        )
-        st.plotly_chart(fig6, width='stretch')
+    fig6 = px.scatter_map(filtered_df,
+        lat='latitude',
+        lon='longitude',
+        hover_name='facility_name',
+        color="management",
+        zoom=4,
+        height=600,
+    )
+    fig6.update_layout(
+        map_style='open-street-map'
+    )
+    st.plotly_chart(fig6, width='stretch')
 
 #Display Table
 def table(filtered_df):
