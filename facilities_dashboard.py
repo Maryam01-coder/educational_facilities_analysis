@@ -84,9 +84,9 @@ def filter_data(df, facility, management, location, start_date, end_date):
 
 def format_students(value):
     if value >= 1000000:
-        return f"{value / 1000000:.0f}M"
+        return f"{value / 1000000:.1f}M"
     elif value >= 1000:
-        return f"{value / 1000:.0f}K"
+        return f"{value / 1000:.1f}K"
     else:
         return f"{value:,.0f}"
 
